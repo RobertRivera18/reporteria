@@ -19,15 +19,5 @@ class NominaController extends Controller
     /**
      * Permite exportar el PDF mediante una ruta directa si se requiere.
      */
-    public function exportarPdf(Request $request, ReporteNominaService $service)
-    {
-        $filtros = $request->only(['fecha_inicio', 'fecha_fin', 'id_compania', 'nomina', 'id_empleado']);
 
-        $data = $service->obtenerNominaProcesada($filtros);
-
-        $pdf = Pdf::loadView('nomina.pdf', $data)
-            ->setPaper('a4', 'landscape');
-
-        return $pdf->stream('reporte_nomina.pdf');
-    }
 }

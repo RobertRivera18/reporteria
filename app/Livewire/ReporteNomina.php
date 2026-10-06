@@ -60,12 +60,12 @@ class ReporteNomina extends Component
         ];
 
         $data = $service->obtenerNominaProcesada($filtros);
-
-        $pdf = Pdf::loadView('nomina.pdf', $data)
-            ->setPaper('a4', 'landscape');
+        $pdf = Pdf::loadView('nomina.pdf', $data + ['filtros' => $filtros])
+            ->setPaper('a4', 'landscape')                                  // el original es A3 horizontal
+            ->setOption(['isPhpEnabled' => true, 'enable_php' => true]);   // para "Page X of Y"
 
         return response()->streamDownload(
-            fn () => print($pdf->output()),
+            fn() => print($pdf->output()),
             'reporte_nomina.pdf'
         );
     }
