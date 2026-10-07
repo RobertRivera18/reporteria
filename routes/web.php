@@ -89,5 +89,32 @@ Route::get('/empleados-compania', function () {
     }
 });
 
+
+Route::get('/nominas-compania', function () {
+    try {
+        $nominas = DB::connection('sqlsrv_vpn')
+            ->table('VN_PERSONAEMPLEADO')
+            ->select('NominaCompania')
+            ->distinct()
+            ->where('EstadoEmpleado', 'ACTIVO')
+            ->whereNotNull('NominaCompania')
+            ->get()
+            ->pluck('NominaCompania')
+            ->map(fn($item) => trim($item))
+            ->unique()
+            ->values();
+
+        return response()->json($nominas, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    } catch (\Throwable $e) {
+        report($e);
+
+        return response()->json([
+            'error'   => 'No se pudo consultar VN_PERSONAEMPLEADO. Verifica la conexión VPN.',
+            'details' => $e->getMessage()
+        ], 500);
+    }
+});
+
 Route::get('/nomina', [NominaController::class, 'index'])->name('nomina.index');
 Route::get('/nomina/pdf', [NominaController::class, 'exportarPdf'])->name('nomina.pdf');
+Route::get('/nomina/dashboard', [NominaController::class, 'dashboard'])->name('nomina.dashboard');

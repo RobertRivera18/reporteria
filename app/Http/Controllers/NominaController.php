@@ -15,9 +15,8 @@ class NominaController extends Controller
     {
         return view('nomina.index');
     }
-
-    /**
-     * Permite exportar el PDF mediante una ruta directa si se requiere.
-     */
-
+    public function dashboard()
+    {
+        return view('nomina.dashboard');
+    }
 }
