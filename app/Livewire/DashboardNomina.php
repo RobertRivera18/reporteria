@@ -46,7 +46,6 @@ class DashboardNomina extends Component
             ->where('EstadoEmpleado', 'ACTIVO')
             ->whereNotNull('NominaCompania');
 
-        // Con "Todas las compañías" se listan las nóminas de todas
         if ($this->id_compania) {
             $query->where('IdCompania', $this->id_compania);
         }
