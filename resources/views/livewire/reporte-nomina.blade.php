@@ -2,23 +2,23 @@
     {{-- Formulario de Filtros --}}
     <div class="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12 lg:items-end">
-            
+
             {{-- Fecha Inicio --}}
             <div class="lg:col-span-2">
                 <label class="mb-1 block text-xs font-semibold text-gray-700 uppercase tracking-wider">Fecha Inicio</label>
-                <input 
-                    type="date" 
-                    wire:model.live.debounce.500ms="fecha_inicio" 
+                <input
+                    type="date"
+                    wire:model.live.debounce.500ms="fecha_inicio"
                     class="w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 transition-colors"
                 >
             </div>
-            
+
             {{-- Fecha Fin --}}
             <div class="lg:col-span-2">
                 <label class="mb-1 block text-xs font-semibold text-gray-700 uppercase tracking-wider">Fecha Fin</label>
-                <input 
-                    type="date" 
-                    wire:model.live.debounce.500ms="fecha_fin" 
+                <input
+                    type="date"
+                    wire:model.live.debounce.500ms="fecha_fin"
                     class="w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 transition-colors"
                 >
             </div>
@@ -26,10 +26,11 @@
             {{-- Compañía --}}
             <div class="lg:col-span-3">
                 <label class="mb-1 block text-xs font-semibold text-gray-700 uppercase tracking-wider">Compañía</label>
-                <select 
-                    wire:model.live="id_compania" 
+                <select
+                    wire:model.live="id_compania"
                     class="w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 transition-colors"
                 >
+                    <option value="">-- TODAS LAS COMPAÑÍAS --</option>
                     @foreach($companias as $comp)
                         <option value="{{ $comp->IdCompania }}" wire:key="comp-{{ $comp->IdCompania }}">
                             {{ $comp->NombreCompania }}
@@ -41,8 +42,8 @@
             {{-- Nómina --}}
             <div class="lg:col-span-3">
                 <label class="mb-1 block text-xs font-semibold text-gray-700 uppercase tracking-wider">Nómina</label>
-                <select 
-                    wire:model.live="nomina" 
+                <select
+                    wire:model.live="nomina"
                     class="w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 transition-colors"
                 >
                     <option value="">-- TODAS LAS NÓMINAS --</option>
@@ -54,14 +55,14 @@
 
             {{-- Botón Exportar PDF --}}
             <div class="lg:col-span-2">
-                <button 
-                    wire:click="exportarPdf" 
-                    wire:loading.attr="disabled" 
+                <button
+                    wire:click="exportarPdf"
+                    wire:loading.attr="disabled"
                     class="inline-flex w-full items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 disabled:opacity-50 transition-colors"
                 >
-                    {{-- Icono opcional / Texto cuando no está cargando --}}
+                    {{-- Texto cuando no está cargando --}}
                     <span wire:loading.remove wire:target="exportarPdf" class="flex items-center gap-1.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         Exportar PDF
@@ -69,7 +70,7 @@
 
                     {{-- Loader en el botón --}}
                     <span wire:loading wire:target="exportarPdf" class="flex items-center gap-2">
-                        <svg class="h-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                        <svg class="h-4 w-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
@@ -89,17 +90,18 @@
         <span class="text-xs font-medium text-gray-500">Cargando reporte...</span>
     </div>
 
-    {{-- Tablas Agrupadas por Nómina --}}
+    {{-- Tablas Agrupadas por Nómina (y por área en NOMINA CLARO) --}}
     @forelse($bloquesReporte as $index => $bloque)
         @php
-            $etiquetaGrupo = "{$nombreCompania} / {$bloque['nombreNomina']}";
+            // Compañía propia del bloque + nombre distintivo (área en Claro, nómina en el resto)
+            $etiquetaGrupo = "{$bloque['nombreCompania']} / {$bloque['nombreBloque']}";
         @endphp
 
         <div class="mb-8 rounded-xl border border-gray-200 bg-white p-5 shadow-sm" wire:key="bloque-{{ $index }}">
             <h6 class="mb-4 text-xs font-bold uppercase tracking-wider text-indigo-600">
                 {{ $etiquetaGrupo }}
             </h6>
-            
+
             <div class="overflow-x-auto rounded-lg border border-gray-200">
                 <table class="w-full text-center text-[11px] leading-tight text-gray-700">
                     <thead class="bg-gray-100 text-[10px] uppercase text-gray-700 font-bold tracking-wider">
@@ -114,13 +116,13 @@
                         <tr class="divide-x divide-gray-200">
                             {{-- Encabezados Ingresos --}}
                             @foreach($bloque['conceptosIngresos'] as $ing)
-                                <th class="p-2 bg-emerald-50/50" wire:key="head-ing-{{ $loop->index }}">{{ $ing }}</th>
+                                <th class="p-2 bg-emerald-50/50" wire:key="head-ing-{{ $index }}-{{ $loop->index }}">{{ $ing }}</th>
                             @endforeach
                             <th class="p-2 bg-emerald-100 text-emerald-900 font-extrabold">TOTAL</th>
 
                             {{-- Encabezados Descuentos --}}
                             @foreach($bloque['conceptosDescuentos'] as $desc)
-                                <th class="p-2 bg-rose-50/50" wire:key="head-desc-{{ $loop->index }}">{{ $desc }}</th>
+                                <th class="p-2 bg-rose-50/50" wire:key="head-desc-{{ $index }}-{{ $loop->index }}">{{ $desc }}</th>
                             @endforeach
                             <th class="p-2 bg-rose-100 text-rose-900 font-extrabold">TOTAL</th>
                         </tr>
@@ -140,9 +142,17 @@
                                 $granTotalDescuentos += $emp->TotalDescuentos;
                                 $granTotalNeto += $emp->NetoARecibir;
                             @endphp
-                            <tr class="divide-x divide-gray-200 hover:bg-gray-50/80 transition-colors" wire:key="emp-{{ $emp->NumeroDocumento ?? $loop->index }}">
+                            <tr class="divide-x divide-gray-200 hover:bg-gray-50/80 transition-colors" wire:key="emp-{{ $index }}-{{ $emp->IdEmpleado }}">
                                 <td class="p-2 whitespace-nowrap text-gray-500 font-mono">{{ $emp->NumeroDocumento }}</td>
-                                <td class="p-2 whitespace-nowrap text-left font-medium text-gray-900">{{ $emp->NombreCompleto }}</td>
+                                <td class="p-2 whitespace-nowrap text-left font-medium text-gray-900">
+                                    {{ $emp->NombreCompleto }}
+                                    @if(($emp->Solicitudes ?? 1) > 1)
+                                        <span class="ml-1 rounded bg-amber-100 px-1 text-[9px] font-bold text-amber-700"
+                                              title="Tiene {{ $emp->Solicitudes }} solicitudes en el período; se muestra solo una">
+                                            {{ $emp->Solicitudes }} sol.
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="p-2 whitespace-nowrap">{{ number_format($emp->Dias, 0) }}</td>
 
                                 {{-- Ingresos --}}
@@ -179,7 +189,7 @@
                         {{-- Fila Totales --}}
                         <tr class="divide-x divide-gray-200 bg-gray-100 font-bold text-right text-gray-900">
                             <td colspan="3" class="p-2 text-left uppercase tracking-wider text-[10px]">Total</td>
-                            
+
                             {{-- Totales Ingresos --}}
                             @foreach($bloque['conceptosIngresos'] as $ing)
                                 <td class="p-2">{{ number_format($totalesIngresosConcepto[$ing], 2) }}</td>
@@ -202,12 +212,12 @@
             {{-- Pie de bloque con resumen --}}
             <div class="mt-4 flex flex-col items-center justify-center gap-1 border-t border-gray-100 pt-3 text-xs font-semibold text-gray-700 sm:flex-row sm:gap-6">
                 <div>
-                    Total <span class="text-indigo-600">{{ $etiquetaGrupo }}</span> del Rol de Pago: 
+                    Total <span class="text-indigo-600">{{ $etiquetaGrupo }}</span> del Rol de Pago:
                     <span class="ml-1 text-sm font-bold text-gray-900">${{ number_format($granTotalNeto, 2) }}</span>
                 </div>
                 <div class="hidden text-gray-300 sm:block">•</div>
                 <div>
-                    Cantidad Trabajadores: 
+                    Cantidad Trabajadores:
                     <span class="ml-1 text-sm font-bold text-gray-900">{{ $bloque['cantidadTrabajadores'] }}</span>
                 </div>
             </div>
